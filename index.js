@@ -33,25 +33,24 @@ app.get('/artists/:id', (req, res) => {
 
 // POST /artists -- create new artist
 app.post('/artists', (req, res) => {
-  //let artist = new Artist({ ----> can also use something like that
-    //name: req.body.name,
-    //origin: req.body.origin,
-    //yearsActive: req.body.yearsActive
-  //});
-  //artist.save((err, queen) => {
-    //res.json(queen)
-  //})
-  Artist.create({
+  let artist = new Artist({ //----> can also use something like that instead of code below
     name: req.body.name,
     origin: req.body.origin,
-    yearsActive: req.body.yearsActive//,
-    //albums: 
-  },
-    function(err, artist) {
-      if (err) res.json(err)
-      res.json(artist)
-    }
-  )
+    yearsActive: req.body.yearsActive
+  });
+  artist.save((err, queen) => {
+    res.json(queen)
+  })
+//   Artist.create({
+//     name: req.body.name,
+//     origin: req.body.origin,
+//     yearsActive: req.body.yearsActive 
+//   },
+//     function(err, artist) {
+//       if (err) res.json(err)
+//       res.json(artist)
+//     }
+//   )
 })
 
 //PUT /artists/:id -- update one artist
@@ -80,14 +79,6 @@ app.delete('/artists/:id', (req, res) => {
       res.json({message: "DELETED!"})
   })
 })
-
-//GET /albums -- get ALL albums
-// app.get('/albums', (req, res) => {
-//   Album.find({}, function(err, albums) {
-//     if (err) res.json(err)
-//     res.json(albums)
-//   })
-// })
 
 //GET /artists/:arid/albums -- get albums for one artist
 app.get('/artists/:id/albums', (req, res) => {
