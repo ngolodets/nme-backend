@@ -6,6 +6,7 @@ const Album = require('./models/album');
 const app = express();
 
 app.use(express.urlencoded({extended: false}));
+app.use(express.json());
 
 //Connect to Mongo!
 mongoose.connect('mongodb://localhost/nme-backend');
@@ -132,5 +133,5 @@ app.delete('/artists/:arid/albums/:alid', (req, res) => {
 
 
 app.listen(3001, () => {
-  console.log("🎸🎸🎸🎸🎸🎸🎸... listening on 3000... 🎸🎸🎸🎸🎸🎸🎸 ");
+  console.log("🎸🎸🎸🎸🎸🎸🎸... listening on 3001... 🎸🎸🎸🎸🎸🎸🎸 ");
 })
