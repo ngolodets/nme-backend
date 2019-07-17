@@ -26,13 +26,21 @@ app.get('/artists', (req, res) => {
 // GET /artists/:id -- get ONE artist
 app.get('/artists/:id', (req, res) => {
   Artist.findById(req.params.id).populate('albums').exec(function(err, artist) {
-    if(err) res.json(err)
-    res.json(artist);
+    if(err) res.status(500).json(err)
+    res.status(200).json(artist);
   })
 })
 
 // POST /artists -- create new artist
 app.post('/artists', (req, res) => {
+  //let artist = new Artist({ ----> can also use something like that
+    //name: req.body.name,
+    //origin: req.body.origin,
+    //yearsActive: req.body.yearsActive
+  //});
+  //artist.save((err, queen) => {
+    //res.json(queen)
+  //})
   Artist.create({
     name: req.body.name,
     origin: req.body.origin,
@@ -46,19 +54,20 @@ app.post('/artists', (req, res) => {
   )
 })
 
-//PUT /artists/:id -- update an artist
+//PUT /artists/:id -- update one artist
 app.put('/artists/:id', (req, res) => {
+
   Artist.findByIdAndUpdate(
     req.params.id, 
-    { $set: {name: req.body.name,
+    { name: req.body.name,
       origin: req.body.origin,
       yearsActive: req.body.yearsActive//,
       //albums: req.body.albums
-    }}, 
+    }, 
     {new: true}, 
-    function (err, artist) {
-      if (eff) res.json(err)
-      res.json(artist)
+    (err, artist) => {
+      if (err) res.json(err)
+      res.status(203).json(artist)
   }) 
 })
 
@@ -80,41 +89,55 @@ app.delete('/artists/:id', (req, res) => {
 //   })
 // })
 
-// GET /albums/:id -- display individual album
-// app.get('/albums/:id', (req, res) => {
-//   Album.findById(req.params.id).populate('artist').exec(function(err, album) {
-//     if (err) res.json(err)
-//     res.json(album)
-//   })
-// })
+//GET /artists/:arid/albums -- get albums for one artist
+app.get('/artists/:id/albums', (req, res) => {
+  Artist.findById(req.params.id).populate('albums').exec((err, queen) => {
+    if (err) res.json(err)
+    res.json(queen)
+  }) 
+})
 
-// DELETE /albums/:id -- delete an album
-// app.delete('/albums/:id', (req, res) => {
-//   Album.findByIdAndDelete(
-//     req.params.id,
-//     function(err) {
-//       if (err) res.json(err)
-//       res.json({message: "DELETED!"})
-//   })
-// })
+//GET /artists/:arid/albums/:alid
+app.get('/artists/:arid/albums/:alid', (req, res) => {
+  Album.findById(req.params.alid, (err, album) => {
+    if (err) res.json(err)
+    res.json(album)
+  })
+})
 
-// POST /artists/:id/albums -- creates new album
-app.post('/artists/:id/albums', (req, res) => {
+//POST /artists/:arid/albums -- creates new album
+app.post('/artists/:id/albums', (req, res) =>{
   Artist.findById(req.params.id, function(err, artist) {
-    artist.albums.push({  name: req.body.name, 
-                          released: req.body.released,
-                          length: req.body.length,
-                          genre: req.body.genre,
-                          producer: req.body.producer,
-                          artist: req.params.id
-    })
-    artist.save(function(err, artist) {
-      if (err) res.json(err)
-      res.json(artist)
+    Album.create({
+      name: req.body.name, 
+      released: req.body.released,
+      length: req.body.length,
+      genre: req.body.genre,
+      producer: req.body.producer,
+      artist: req.params.id
+      }, function(err,album){
+          artist.albums.push(album)
+          artist.save(function(err, artist){
+            if (err) res.json(err)
+            res.json(artist)
+      })
     })
   })
 })
 
+//DELETE /artists/:arid/albums/:alid -- detete one album from one artist
+app.delete('/artists/:arid/albums/:alid', (req, res) => {
+  Artist.findById(req.params.arid, (err, artist) => {
+    artist.albums.pull(req.params.alid)
+    artist.save(err => {
+      if (err) res.json(err)
+      Album.deleteOne({_id: req.params.alid}, err => {
+        if (err) res.json(err)
+        res.json(1)
+      })
+    })
+  })
+})
 
 
 app.listen(3001, () => {
